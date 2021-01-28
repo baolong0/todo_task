@@ -1,0 +1,83 @@
+{
+  "name": "parking001",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build && npm run serve",
+    "build": "npx webpack --config webpack.config.js",
+    "postbuild": "npm run copy-files",
+    "serve": "node dist/apps/api/index.js",
+    "test": "NODE_ENV=test npx jest --runInBand --detectOpenHandles --forceExit --bail",
+    "test:unit": "NODE_ENV=test npx jest unit",
+    "test:integration": "NODE_ENV=test npx jest int --runInBand --detectOpenHandles --forceExit --bail",
+    "compile": "tsc -p .",
+    "copy-files": "npx copyfiles -u 1 -V src/sql/**/*.pgsql dist"
+  },
+  "keywords": [],
+  "author": "Phat Tran",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bluebird": "^3.5.30",
+    "@types/hapi__joi": "^16.0.12",
+    "@types/jest": "^25.2.1",
+    "@types/joi": "^14.3.4",
+    "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-response-time": "^2.1.0",
+    "@types/koa-router": "^7.4.0",
+    "@types/koa__cors": "^3.0.2",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.11.0",
+    "@types/pg": "^7.14.3",
+    "@types/pino": "^5.17.0",
+    "copyfiles": "^2.2.0",
+    "jest": "^25.2.7",
+    "nodemon": "^2.0.3",
+    "prettier": "^2.0.4",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^25.3.1",
+    "ts-loader": "^6.2.2",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "tslint-config-airbnb": "^5.11.2",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.3.0",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "@koa/cors": "^3.1.0",
+    "@types/uuid": "^8.0.0",
+    "bluebird": "^3.7.2",
+    "dayjs": "^1.8.24",
+    "koa": "^2.11.0",
+    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-response-time": "^2.1.0",
+    "koa-router": "^8.0.8",
+    "lodash": "^4.17.20",
+    "pg": "^8.0.0",
+    "pg-monitor": "^1.4.0",
+    "pg-promise": "^10.5.2",
+    "pino": "^6.1.1",
+    "uuid": "^7.0.3"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}

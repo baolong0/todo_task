@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: todoadmin
+      POSTGRES_PASSWORD: cdhJtanCcgurtXlvBWWdO1i
+      POSTGRES_DB: todo_dev
+    ports:
+      - "5432:5432"
+
+  api:
+    depends_on:
+      - db
+    build: .
+    restart: always
+    volumes:
+      - ./dist:/opt/app
+      - ./media:/opt/media
+    environment:
+      NODE_ENV: development
+      SERVER_PORT: 3000
+      PSQL_HOST: db
+      PSQL_PORT: 5432
+      PSQL_USER: todoadmin
+      PSQL_PASSWORD: cdhJtanCcgurtXlvBWWdO1i
+      PSQL_DATABASE: todo_dev
+      INTERNAL_API_KEY: nyHasOC2v0SaPAOrawFlCPLH25P*Vpu83RF%W3^UJk6AiupX6*
+    ports:
+      - "8081:3000"

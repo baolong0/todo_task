@@ -1,0 +1,779 @@
+openapi: 3.0.2
+info:
+  title: Todo API
+  description: >-
+    This page will contain all Todo's APIs.
+    
+
+    You can try each API by passing required parameters, and then click: 'Try it out'
+  termsOfService: 'none'
+  contact:
+    email: todo@st001.com
+  version: 1.0.0
+servers:
+  - url: https://api.todo.com
+    description: Staging server
+tags:
+  - name: user
+    description: Everything about user (includes normal user and admin), authentication, authorization
+  - name: task
+    description: Everything about task (creating, updating, deleting, ... tasks)
+  - name: file
+    description: Everything about file (uploading, updating, deleting, ... files)
+paths:
+  /users:
+    post:
+      tags:
+        - user
+      summary: 'Create a new normal user'
+      operationId: createUser
+      requestBody:
+        $ref: '#/components/requestBodies/NewUserReq'
+        required: true
+      responses:
+        '201':
+          description: 'Create an user successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRes'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorRes'
+        '422':
+          description: Email is already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+    delete:
+      tags:
+        - user
+      summary: 'Delete myself'
+      operationId: deleteMySelf
+      responses:
+        '204':
+          description: 'Delete myself successfully'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+    
+  /users/me:
+    get:
+      tags:
+        - user
+      summary: Get my profile
+      operationId: getMe
+      responses:
+        '200':
+          description: 'Get my profile successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRes'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+
+  /users/{id}:
+    get:
+      tags:
+        - user
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: UserId
+          required: true
+          schema:
+            type: string
+            example: 946c1f13-9f9b-4d7e-8fd4-8b5d97d32b34
+      responses:
+        '200':
+          description: 'Get an user successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRes'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorRes'
+        '422':
+          description: 'User is not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+    put:
+      tags:
+        - user
+      summary: 'Update an user'
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: UserId
+          required: true
+          schema:
+            type: string
+            example: 946c1f13-9f9b-4d7e-8fd4-8b5d97d32b34
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserReq'
+        required: true
+      responses:
+        '200':
+          description: 'Update the user successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRes'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorRes'
+        '404':
+          description: User is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+
+  /users/login:
+    post:
+      tags:
+        - user
+      summary: Logs user into the system
+      operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/LoginReq'
+        required: true
+      responses:
+        '200':
+          description: 'Logs user into the system successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRes'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorRes'
+        '422':
+          description: 'Email or password is not correct'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+
+  /tasks:
+    get:
+      tags:
+        - task
+      summary: 'Get all my tasks'
+      operationId: getMyTasks
+      responses:
+        '200':
+          description: 'Get my tasks successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListRes'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+    post:
+      tags:
+        - task
+      summary: 'Create a todo task'
+      operationId: createMyTask
+      requestBody:
+        $ref: '#/components/requestBodies/NewTaskReq'
+        required: true
+      responses:
+        '201':
+          description: 'create todo task successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailTaskRes'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorRes'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []    
+  /tasks/{id}:
+    get:
+      tags:
+        - task
+      summary: 'Get detail task by id'
+      operationId: getDetailTask
+      parameters:
+        - name: id
+          in: path
+          description: TaskId
+          required: true
+          schema:
+            type: string
+            example: 946c1f13-9f9b-4d7e-8fd4-8b5d97d32b34
+      responses:
+        '200':
+          description: 'Get detail task successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailTaskRes'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+
+  /tasks/{id}/attachments:
+    post:
+      tags:
+        - task
+      summary: 'Add attachments to task'
+      operationId: addAttachment
+      parameters:
+        - name: id
+          in: path
+          description: TaskId
+          required: true
+          schema:
+            type: string
+            example: 946c1f13-9f9b-4d7e-8fd4-8b5d97d32b34
+            
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: 'Add attachments to task successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRes'
+        '400':
+          description: 'Attachment file cannot be empty'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+  /tasks/{taskId}/attachments/{attachmentId}:
+    delete:
+      tags:
+        - task
+      summary: 'remove attachments from a task'
+      operationId: removeAttachments 
+      parameters:
+        - name: taskId
+          in: path
+          description: TaskId
+          required: true
+          schema:
+            type: string
+            example: 8be92150-a271-4043-8e50-8c2608a27ff9
+        - name: attachmentId
+          in: path
+          description: AttachmentId
+          required: true
+          schema:
+            type: string
+            example: 9d4fad77-6c50-40dd-8eb0-8ec2fb4cb44b
+      responses:    
+        '204':
+          description: 'Delete Attachment from task successfully'
+        '400':
+          description: 'Bad request'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+  /files/upload:
+    post:
+      tags:
+        - file
+      summary: 'Add attachments file before creating a task'
+      operationId: upload           
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: 'upload successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRes'
+        '400':
+          description: 'Bad request'
+        '401':
+          description: 'Invalid or missing token or the user is deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizationErrorRes'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorRes'
+      security:
+        - token: []
+components:
+  schemas:
+    ValidationErrorItem:
+      type: object
+      properties:
+        path:
+          type: string
+          example: profile/email
+        message:
+          type: string
+          example: 'Email should follow this format: name@domain'
+      required:
+        - path
+        - message
+    ValidationErrorRes:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 400
+        message:
+          type: string
+          example: 'Invalid request'
+        reasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorItem'
+      required:
+        - status
+        - message
+        - reasons
+
+    UnauthorizationErrorRes:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 401
+        message:
+          type: string
+          example: 'Access is denied due to invalid credentials'
+
+    NotFoundErrorRes:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 404
+        message:
+          type: string
+          example: 'Resource is not found'
+    
+    UnprocessableErrorRes:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 422
+        message:
+          type: string
+          example: 'Email is already exists'
+
+    InternalServerErrorRes:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 500
+        message:
+          type: string
+          example: 'Internal Server Error'
+
+#---- Begin User -----
+    UserRes:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+            firstName:
+              type: string
+              example: Tony
+            lastName:
+              type: string
+              example: Stark
+            email:
+              type: string
+              example: john@email.com
+            role:
+              type: string
+              example: user
+            createdAt:
+              type: string
+              example: '2020-12-02T16:25:33.614Z'
+            updatedAt:
+              type: string
+              example: '2020-12-02T16:25:33.614Z'
+#---- End User  -----
+#---- Begin Task ----
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+        name:
+          type: string
+          example: personal
+      
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+        name:
+          type: string
+          example: 'C-sharp-basic.pdf'
+        path:
+          type: string
+          example: 'static/attachments/c_sharp_basic.pdf'
+        createdAt:
+          type: string
+          example: '2020-12-02T16:25:33.614Z'
+        updatedAt:
+          type: string
+          example: '2020-12-02T16:25:33.614Z'
+    
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+        log:
+          type: string
+          example: 'You created the task'
+        createdAt:
+          type: string
+          example: '2020-12-02T16:25:33.614Z'
+        updatedAt:
+          type: string
+          example: '2020-12-02T16:25:33.614Z'
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+        name:
+          type: string
+          example: Do my homework
+        dueTime:
+          type: string
+          example: '2020-12-02T16:25:33.614Z'
+        status:
+          type: string
+          example: undone
+          enum:
+            - done
+            - undone
+        tagsList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    TaskListRes:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+
+    DetailTaskRes:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: '4c385075-5238-4685-ba49-8c68b00fe6cc'
+            name:
+              type: string
+              example: Do my homework
+            description:
+              type: string
+              example: 'Do C-Sharp homework and dont forget reading the book first'
+            dueTime:
+              type: string
+              example: '2020-12-02T16:25:33.614Z'
+            status:
+              type: string
+              example: undone
+              enum:
+                - done
+                - undone
+            tagsList:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+            activitiesList:
+              type: array
+              items:
+                $ref: '#/components/schemas/Activity'
+            attachmentsList:
+              type: array
+              items:
+                $ref: '#/components/schemas/Attachment'
+#---- End Task  -----
+#---- Begin File ----
+    FileRes: 
+      type: object
+      properties: 
+        data: 
+          type: object
+          properties:
+             path:
+              type: string
+              example: '/home/ubuntu/app/file/MyPicture.png'
+#--- End File ---
+  requestBodies:
+  # --- Begin User ---
+    NewUserReq:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: user1@gmail.com
+              password:
+                type: string
+                example: K732F*j2!x3
+              firstName:
+                type: string
+                example: Tony
+              lastName:
+                type: string
+                example: Stark
+            required:
+              - email
+              - password
+              - firstName
+              - lastName
+    LoginReq:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: user1@gmail.com
+              password:
+                type: string
+                example: K732F*j2!x3
+            required:
+              - email
+              - password
+
+    UpdateUserReq:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+                example: Tony
+              lastName:
+                type: string
+                example: Stark
+              password:
+                type: string
+                example: K732F*j2!x3
+            required:
+              - firstName
+              - lastName
+              - password
+  # --- End User ---
+  # --- Begin Task ---
+    NewTaskReq: 
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              taskName:
+                type: string
+                example: Do my homework
+              description:
+                type: string
+                example: 'Do C-Sharp homework and dont forget reading the book first'
+              dueTime:
+                type: string
+                example: '2021-12-02T16:25:33.614Z'         
+              tags:
+                type: array
+                items:
+                  type: string
+                example: 
+                  - 'CSharp'
+                  - 'Homework'
+              attachments:
+                type: array
+                items:
+                  type: object
+                  properties: 
+                    name: 
+                      type: string
+                      example: 'My picture'
+                    path: 
+                      type: string 
+                      example: '/opt/app/files/MyPicture.jpg'
+  # --- End Task ---
+
+  securitySchemes:
+    token:
+      type: apiKey
+      name: Authorization
+      in: header
